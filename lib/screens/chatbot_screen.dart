@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../model/chat_message.dart';
 import '../services/ollama_service.dart';
 import '../widgets/message_bubble.dart';
@@ -19,7 +18,6 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   List<ChatMessage> _messages = [];
   bool _isTyping = false;
-  String _displayResponse = '';
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -34,24 +32,24 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   }
 
   Future<void> _sendMessage(String message) async {
-    // Add user message
     setState(() {
       _messages.add(ChatMessage(text: message, isUser: true));
       _isTyping = true;
-      _displayResponse = '';
     });
     _scrollToBottom();
 
     try {
       final responseStream = await _ollamaService.sendMessage(message);
-      
-      final aiMessage = ChatMessage(text: '', isUser: false);
-      _messages.add(aiMessage);
+      final aiResponseIndex = _messages.length;
+      _messages.add(ChatMessage(text: '', isUser: false));
 
       responseStream.listen(
         (chunk) {
           setState(() {
-            _displayResponse += chunk;
+            _messages[aiResponseIndex] = ChatMessage(
+              text: _messages[aiResponseIndex].text + chunk,
+              isUser: false,
+            );
           });
           _scrollToBottom();
         },
@@ -64,18 +62,18 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           setState(() {
             _isTyping = false;
             _messages.add(ChatMessage(
-              text: 'Error: Unable to get response. Check Ollama server.',
-              isUser: false
+              text: 'Error: Unable to get response',
+              isUser: false,
             ));
           });
-        }
+        },
       );
     } catch (e) {
       setState(() {
         _isTyping = false;
         _messages.add(ChatMessage(
-          text: 'Error: Unable to send message.',
-          isUser: false
+          text: 'Error: Unable to send message',
+          isUser: false,
         ));
       });
     }
@@ -104,15 +102,17 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               controller: _scrollController,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
-                final isLastMessage = index == _messages.length - 1 && !_messages[index].isUser;
                 return MessageBubble(
                   message: _messages[index],
-                  isLastMessage: isLastMessage,
-                  displayResponse: isLastMessage ? _displayResponse : null,
                 );
               },
             ),
           ),
+          if (_isTyping)
+            const LinearProgressIndicator(
+              backgroundColor: Colors.transparent,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+            ),
           ChatInputField(
             controller: _messageController,
             onSend: () {
