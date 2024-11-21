@@ -38,10 +38,10 @@ class _ChatInputFieldState extends State<ChatInputField> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withOpacity(0.2),
             spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 2),
+            blurRadius: 5,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -51,7 +51,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
             child: TextField(
               controller: widget.controller,
               decoration: InputDecoration(
-                hintText: 'Type a message',
+                hintText: 'Type your message...',
                 hintStyle: TextStyle(color: Colors.deepPurple.shade300),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 border: InputBorder.none,
@@ -61,10 +61,9 @@ class _ChatInputFieldState extends State<ChatInputField> {
           ),
           IconButton(
             icon: Icon(
-              Icons.send, 
-              color: _isButtonEnabled 
-                ? Colors.deepPurple 
-                : Colors.grey
+              Icons.send_rounded,
+              color: _isButtonEnabled ? Colors.deepPurple : Colors.grey,
+              size: 28,
             ),
             onPressed: _isButtonEnabled ? widget.onSend : null,
           ),
