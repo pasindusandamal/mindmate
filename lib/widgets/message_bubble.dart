@@ -1,64 +1,60 @@
 import 'package:flutter/material.dart';
-
 import '../model/chat_message.dart';
-
 
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
-  final bool isLastMessage;
-  final String? displayResponse;
 
   const MessageBubble({
     Key? key,
     required this.message,
-    this.isLastMessage = false,
-    this.displayResponse,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final bool isUser = message.isUser;
-    final String text = isLastMessage && displayResponse != null 
-        ? displayResponse! 
-        : message.text;
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isUser ? Colors.deepPurple[50] : Colors.purple[100],
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(15),
-            topRight: const Radius.circular(15),
-            bottomLeft: isUser ? const Radius.circular(15) : Radius.zero,
-            bottomRight: isUser ? Radius.zero : const Radius.circular(15),
-          ),
+          gradient: isUser
+              ? LinearGradient(
+                  colors: [Colors.deepPurple[100]!, Colors.deepPurple[50]!],
+                )
+              : LinearGradient(
+                  colors: [Colors.purple[100]!, Colors.purple[50]!],
+                ),
+          borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 2),
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
+        padding: const EdgeInsets.all(12),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              isUser ? Icons.person : Icons.android,
-              color: isUser ? Colors.deepPurple : Colors.purple,
-              size: 20,
+            CircleAvatar(
+              backgroundColor: isUser ? Colors.deepPurple : Colors.purple,
+              radius: 20,
+              child: Icon(
+                isUser ? Icons.person_outline : Icons.android,
+                color: Colors.white,
+                size: 22,
+              ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             Flexible(
               child: Text(
-                text,
+                message.text,
                 style: TextStyle(
                   color: isUser ? Colors.deepPurple[900] : Colors.purple[900],
+                  fontSize: 16,
                 ),
               ),
             ),
