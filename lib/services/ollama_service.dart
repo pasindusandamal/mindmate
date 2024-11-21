@@ -10,7 +10,7 @@ class OllamaService {
 
     try {
       final url = 'http://localhost:11434/api/generate';
-      
+
       final response = await _dio.post(
         url,
         data: {
@@ -21,20 +21,20 @@ class OllamaService {
         options: Options(responseType: ResponseType.stream),
       );
 
-      String accumulatedResponse = '';
-
       await (response.data as ResponseBody).stream.forEach((chunk) {
         String responseChunk = utf8.decode(chunk);
-        
+
         LineSplitter.split(responseChunk).forEach((line) {
           if (line.trim().isNotEmpty) {
             try {
               var jsonResponse = json.decode(line);
-              
+
               if (jsonResponse['response'] != null) {
-                String partialResponse = jsonResponse['response'];
-                accumulatedResponse += partialResponse;
-                streamController.add(partialResponse);
+                // Stream each character individually
+                final String partialResponse = jsonResponse['response'];
+                for (int i = 0; i < partialResponse.length; i++) {
+                  streamController.add(partialResponse[i]);
+                }
               }
 
               if (jsonResponse['done'] == true) {
